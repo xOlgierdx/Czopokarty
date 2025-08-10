@@ -471,11 +471,16 @@ function pokazKarty() {
       const cena = koszt.gold;
 
       document.getElementById("upgrade-img").src = karta.image;
-      document.getElementById("upgrade-title").innerText = `${nazwa} — Lvl ${karta.level}`;
-      document.getElementById("upgrade-info").innerText = 
-        `Potrzebujesz ${wymagane} kart i ${cena} złota, aby ulepszyć na poziom ${karta.level + 1}.\nMasz ${karta.count} kart.`;
+  document.getElementById("upgrade-title").innerText = `${nazwa} — Lvl ${karta.level}`;
+  document.getElementById("upgrade-info").innerText = 
+    `Masz ${karta.count} / ${wymagane} kart.
+Potrzebujesz ${wymagane} kart i ${cena} złota, aby ulepszyć na poziom ${karta.level + 1}.`;
 
-      document.getElementById("upgrade-modal-bg").style.display = "flex";
+const btnUpgrade = document.querySelector(".btn-upgrade");
+  btnUpgrade.innerText = `Ulepsz (${cena} złota)`;
+
+      
+        document.getElementById("upgrade-modal-bg").style.display = "flex";
     }
 
     function closeUpgradeModal() {
