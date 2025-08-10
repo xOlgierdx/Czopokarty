@@ -94,6 +94,63 @@
   50% { background-position: 100% 50%; }
   100% { background-position: 0% 50%; }
 }
+
+#upgrade-modal-bg {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal okno */
+#upgrade-modal {
+  background: #1e1e2f;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  color: white;
+  max-width: 350px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+#upgrade-modal img {
+  width: 100px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+#upgrade-modal h3 {
+  margin: 10px 0;
+}
+
+.modal-buttons {
+  margin-top: 15px;
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-upgrade {
+  background: linear-gradient(90deg, gold, orange);
+  color: black;
+}
+
+.btn-cancel {
+  background: #555;
+  color: white;
+}
   </style>
 </head>
 <body>
@@ -106,6 +163,18 @@
   <div id="gold-info"></div>
   <div id="gems-info"></div>
   <div id="cards"></div>
+
+  <div id="upgrade-modal-bg">
+    <div id="upgrade-modal">
+      <img id="upgrade-img" src="" alt="">
+      <h3 id="upgrade-title"></h3>
+      <p id="upgrade-info"></p>
+      <div class="modal-buttons">
+        <button class="modal-btn btn-upgrade" onclick="confirmUpgrade()">Ulepsz</button>
+        <button class="modal-btn btn-cancel" onclick="closeUpgradeModal()">Anuluj</button>
+      </div>
+    </div>
+  </div>
 
   <script>
     const rarityConfig = {
@@ -386,32 +455,53 @@ function pokazKarty() {
         }
       });
     }
+     let upgradeTarget = null;
+
     function pokazOknoUlepszenia(nazwa) {
       const karta = player.cards[nazwa];
       if (!karta) return;
-
       if (karta.level >= 3) {
         alert(`${nazwa} jest już na maksymalnym poziomie!`);
         return;
       }
 
+      upgradeTarget = nazwa;
       const koszt = rarityConfig[karta.rarity].upgradeCost[karta.level];
       const wymagane = koszt.cards;
       const cena = koszt.gold;
-      if (confirm(`${nazwa} (${karta.count}/${wymagane} kart) — Ulepszenie za ${cena} złota?`)) {
-        if (karta.count >= wymagane && player.gold >= cena) {
-          karta.count -= wymagane;
-          player.gold -= cena;
-          karta.level++;
-          if (karta.level === 3) alert(`${nazwa} osiągnęła poziom MAX!`);
-          savePlayer();
-          pokazKarty();
-        } else {
-          alert("Za mało kart lub złota.");
-        }
-      }
+
+      document.getElementById("upgrade-img").src = karta.image;
+      document.getElementById("upgrade-title").innerText = `${nazwa} — Lvl ${karta.level}`;
+      document.getElementById("upgrade-info").innerText = 
+        `Potrzebujesz ${wymagane} kart i ${cena} złota, aby ulepszyć na poziom ${karta.level + 1}.\nMasz ${karta.count} kart.`;
+
+      document.getElementById("upgrade-modal-bg").style.display = "flex";
     }
 
+    function closeUpgradeModal() {
+      document.getElementById("upgrade-modal-bg").style.display = "none";
+    }
+
+    function confirmUpgrade() {
+      const nazwa = upgradeTarget;
+      const karta = player.cards[nazwa];
+      const koszt = rarityConfig[karta.rarity].upgradeCost[karta.level];
+
+      if (karta.count >= koszt.cards && player.gold >= koszt.gold) {
+        karta.count -= koszt.cards;
+        player.gold -= koszt.gold;
+        karta.level++;
+        if (karta.level === 3) alert(`${nazwa} osiągnęła poziom MAX!`);
+        savePlayer();
+        pokazKarty();
+      } else {
+        alert("Za mało kart lub złota.");
+      }
+
+      closeUpgradeModal();
+    }
+
+    
     pokazKarty();
   </script>
 </body>
