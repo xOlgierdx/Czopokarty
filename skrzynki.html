@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Otwieranie Skrzynek</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+      padding: 30px;
+      text-align: center;
+    }
+    
+    h1 {
+      margin-bottom: 20px;
+    }
+    button {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #recent-drops {
+      margin-top: 20px;
+      background: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: left;
+      color: black;
+    }
+    .drop-entry {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      color: black;
+    }
+    .drop-entry img {
+      width: 80px;
+      height: 80px;
+      margin-right: 15px;
+    }
+    #gold-info, #gems-info {
+      font-size: 18px;
+      margin-top: 10px;
+      font-weight: bold;
+      color: rgb(241, 238, 238);
+    }
+    #cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      margin-top: 20px;
+      color: black;
+    }
+    .card-entry {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 130px;
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      text-align: center;
+      cursor: pointer;
+    }
+    .card-entry img {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 8px;
+      border-radius: 5px;
+    }
+    .max-level {
+      background: linear-gradient(135deg, gold, orange);
+    }
+    body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(-45deg, #1a1a2e, #16213e, #0f3460, #533483);
+  background-size: 400% 400%;
+  animation: gradientMove 15s ease infinite;
+  color: white;
+}
+.card {
+  color: black; /* przywraca czcionkę kart */
+}
+
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+  </style>
+</head>
+<body>
+  <h1>✨ Otwieranie Skrzynek ✨</h1>
+  <button onclick="otworzSkrzynke()">🔐 Otwórz skrzynkę</button>
+  <button onclick="otworzZlotaSkrzynie()">👑 Złota skrzynia (500 złota)</button>
+  <button onclick="otworzLegendarnaSkrzynia()">🏆 Legendarna skrzynia (50 💎)</button>
+  
+  <div id="recent-drops"></div>
+  <div id="gold-info"></div>
+  <div id="gems-info"></div>
+  <div id="cards"></div>
+
+  <script>
+    const rarityConfig = {
+      "pospolita": { chance: 0.5, amount: [1, 50], upgradeCost: { 1: { cards: 200, gold: 200 }, 2: { cards: 500, gold: 500 } } },
+      "rzadka":    { chance: 0.3, amount: [1, 10], upgradeCost: { 1: { cards: 100, gold: 200 }, 2: { cards: 200, gold: 500 } } },
+      "epicka":    { chance: 0.1, amount: [1, 5],  upgradeCost: { 1: { cards: 20,  gold: 200 }, 2: { cards: 40,  gold: 500 } } },
+      "legendarna":{ chance: 0.05, amount: [1, 1], upgradeCost: { 1: { cards: 3,   gold: 200 }, 2: { cards: 5,   gold: 500 } } },
+    };
+
+    const cardPool = {
+      pospolita: [
+        { name: "Czarny Wdowiec", image: "grafiki/Swdowa.jpg" },
+        { name: "Uma", image: "grafiki/Suma.jpg" },
+        { name: "Pobin", image: "grafiki/Ppobin.jpg" },
+        { name: "Plebs", image: "grafiki/Pplebs.jpg" },
+        { name: "Głupia głowa", image: "grafiki/Pmimir.jpg" },
+        { name: "Marcin Stark", image: "grafiki/Mstark.jpg" },
+        { name: "Mrost", image: "grafiki/Mrost.jpg" },
+        { name: "Czoker", image: "grafiki/Mjoker.jpg" }
+      ],
+      rzadka: [
+        { name: "Śmiertkeus", image: "grafiki/Satr.jpg" },
+        { name: "Ruda baba", image: "grafiki/Saloy.jpg" },
+        { name: "Oldur", image: "grafiki/Obal.jpg" },
+        { name: "Punishczop", image: "grafiki/Mpunish.jpg" },
+        { name: "Kodyn", image: "grafiki/Kodyn.jpg" }
+      ],
+      epicka: [
+        { name: "Szkarłatna wiedźma", image: "grafiki/Owanda.jpg" },
+        { name: "Liga Tropicieli", image: "grafiki/OKMliga.jpg" },
+        { name: "Dziwak", image: "grafiki/Kstrange.jpg" },
+        { name: "Smeskel i Kambert", image: "grafiki/KSlamesk.jpg" }
+      ],
+      legendarna: [
+        { name: "Lady Dziadek", image: "grafiki/Slady.jpg" },
+        { name: "Olgierd", image: "grafiki/Olgierd.jpg" },
+        { name: "Czysty Chaos", image: "grafiki/OKws.jpg" },
+        { name: "God of Hunger", image: "grafiki/Mgoh.jpg" },
+        { name: "Czop z Wiejskiej", image: "grafiki/Mgeralt.jpg" },
+        { name: "Fatbat", image: "grafiki/Mfatbat.jpg" }
+      ]
+    };
+
+    let player = JSON.parse(localStorage.getItem("playerData")) || {
+      gold: 0,
+      gems: 0,
+      cards: {},
+      dailyOpens: 0,
+      lastOpenDate: ""
+    };
+
+    function savePlayer() {
+      localStorage.setItem("playerData", JSON.stringify(player));
+    }
+
+    function losujRzadkosc() {
+      const roll = Math.random();
+      let cumulative = 0;
+      for (const rarity in rarityConfig) {
+        cumulative += rarityConfig[rarity].chance;
+        if (roll < cumulative) return rarity;
+      }
+      return "pospolita";
+    }
+
+    function getRandomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function resetDailyOpensIfNewDay() {
+      const today = new Date().toDateString();
+      if (player.lastOpenDate !== today) {
+        player.dailyOpens = 0;
+        player.lastOpenDate = today;
+        savePlayer();
+      }
+    }
+
+    function otworzSkrzynke() {
+      resetDailyOpensIfNewDay();
+      if (player.dailyOpens >= 5) {
+        alert("Osiągnąłeś dzienny limit 5 skrzyń!");
+        return;
+      }
+
+      const recentDiv = document.getElementById("recent-drops");
+      recentDiv.innerHTML = `<h3>🎁 Wypadło z ostatniej skrzynki:</h3>`;
+
+      const gold = getRandomInt(1, 50);
+      const gems = getRandomInt(1, 5);
+      player.gold += gold;
+      player.gems += gems;
+      recentDiv.innerHTML += `<div class="drop-entry"><strong>💰 ${gold} złota</strong></div>`;
+      recentDiv.innerHTML += `<div class="drop-entry"><strong>💎 ${gems} gemów</strong></div>`;
+
+      for (let i = 0; i < 3; i++) {
+        const rarity = losujRzadkosc();
+        let availableCards = cardPool[rarity].filter(card => {
+          let data = player.cards[card.name];
+          return !data || data.level < 3;
+        });
+        if (availableCards.length === 0) continue;
+
+        const chosen = availableCards[getRandomInt(0, availableCards.length - 1)];
+        const [min, max] = rarityConfig[rarity].amount;
+        const amount = getRandomInt(min, max);
+
+        if (!player.cards[chosen.name]) {
+          player.cards[chosen.name] = { count: 0, level: 1, rarity: rarity, image: chosen.image };
+        }
+
+        player.cards[chosen.name].count += amount;
+
+        recentDiv.innerHTML += `
+          <div class="drop-entry">
+            <img src="${chosen.image}" alt="${chosen.name}" />
+            <div>${chosen.name} (${rarity}, +${amount})</div>
+          </div>
+        `;
+      }
+
+      player.dailyOpens++;
+      savePlayer();
+      pokazKarty();
+    }
+
+    function otworzLegendarnaSkrzynia() {
+      if (player.gems < 50) {
+        alert("Za mało gemów!");
+        return;
+      }
+
+      const recentDiv = document.getElementById("recent-drops");
+      recentDiv.innerHTML = `<h3>🎁 Wypadło z legendarnej skrzyni:</h3>`;
+
+      player.gems -= 50;
+
+      let availableLegends = cardPool["legendarna"].filter(card => {
+        let data = player.cards[card.name];
+        return !data || data.level < 3;
+      });
+      if (availableLegends.length === 0) {
+        alert("Masz już wszystkie legendarne karty na max poziomie!");
+        savePlayer();
+        pokazKarty();
+        return;
+      }
+
+      const chosen = availableLegends[getRandomInt(0, availableLegends.length - 1)];
+      if (!player.cards[chosen.name]) {
+        player.cards[chosen.name] = { count: 0, level: 1, rarity: "legendarna", image: chosen.image };
+      }
+      player.cards[chosen.name].count += 1;
+
+      recentDiv.innerHTML += `
+        <div class="drop-entry">
+          <img src="${chosen.image}" alt="${chosen.name}" />
+          <div>${chosen.name} (legendarna, +1)</div>
+        </div>
+      `;
+
+      savePlayer();
+      pokazKarty();
+    }
+
+    function otworzZlotaSkrzynie() {
+  if (player.gold < 500) {
+    alert("Nie masz wystarczająco złota!");
+    return;
+  }
+  player.gold -= 500;
+
+  const recentDiv = document.getElementById("recent-drops");
+  recentDiv.innerHTML = `<h3>🎁 Wypadło z ostatniej skrzynki:</h3>`;
+
+  // Gemy
+  const gems = getRandomInt(1, 10);
+  player.gems += gems;
+  recentDiv.innerHTML += `<div class="drop-entry"><strong>💎 ${gems} gemów</strong></div>`;
+
+  // 2 losowe rzadkie karty
+  for (let i = 0; i < 2; i++) {
+    const cards = cardPool["rzadka"];
+    const chosen = cards[getRandomInt(0, cards.length - 1)];
+    const [min, max] = rarityConfig["rzadka"].amount;
+    const amount = getRandomInt(min, max);
+
+    if (!player.cards[chosen.name]) {
+      player.cards[chosen.name] = { count: 0, level: 1, rarity: "rzadka", image: chosen.image };
+    }
+    player.cards[chosen.name].count += amount;
+
+    recentDiv.innerHTML += `
+      <div class="drop-entry">
+        <img src="${chosen.image}" alt="${chosen.name}" />
+        <div>${chosen.name} (rzadka, +${amount})</div>
+      </div>
+    `;
+  }
+
+  // 2 losowe epickie karty
+  for (let i = 0; i < 2; i++) {
+    const cards = cardPool["epicka"];
+    const chosen = cards[getRandomInt(0, cards.length - 1)];
+    const [min, max] = rarityConfig["epicka"].amount;
+    const amount = getRandomInt(min, max);
+
+    if (!player.cards[chosen.name]) {
+      player.cards[chosen.name] = { count: 0, level: 1, rarity: "epicka", image: chosen.image };
+    }
+    player.cards[chosen.name].count += amount;
+
+    recentDiv.innerHTML += `
+      <div class="drop-entry">
+        <img src="${chosen.image}" alt="${chosen.name}" />
+        <div>${chosen.name} (epicka, +${amount})</div>
+      </div>
+    `;
+  }
+
+  savePlayer();
+  pokazKarty();
+}
+
+function pokazKarty() {
+      document.getElementById("gold-info").innerHTML = `💰 Złoto: ${player.gold}`;
+      document.getElementById("gems-info").innerHTML = `💎 Gemy: ${player.gems}`;
+      const container = document.getElementById("cards");
+      container.innerHTML = ``;
+
+      const rarityOrder = ["legendarna", "epicka", "rzadka", "pospolita"];
+      const rarityNames = {
+        legendarna: "🌟 Legendarne",
+        epicka: "💎 Epickie",
+        rzadka: "🔷 Rzadkie",
+        pospolita: "⚪ Pospolite"
+      };
+
+      rarityOrder.forEach(rarity => {
+        const totalCards = cardPool[rarity].length;
+
+        // Liczymy ile kart gracz posiada (count > 0) w danej rzadkości
+        const ownedCardsCount = cardPool[rarity].filter(card => {
+          return player.cards[card.name] && player.cards[card.name].count > 0;
+        }).length;
+
+        // Nagłówek z licznikiem
+        container.innerHTML += `<h2 style="width:100%;text-align:left;margin-top:20px;">
+          ${rarityNames[rarity]} ${ownedCardsCount}/${totalCards}
+        </h2>`;
+
+        // Filtrujemy i pokazujemy tylko posiadane karty danej rzadkości
+        const rowCards = Object.entries(player.cards)
+          .filter(([name, c]) => c.rarity === rarity && c.count > 0);
+
+        if (rowCards.length > 0) {
+          const rowDiv = document.createElement("div");
+          rowDiv.style.display = "flex";
+          rowDiv.style.flexWrap = "wrap";
+          rowDiv.style.gap = "15px";
+          rowDiv.style.marginBottom = "20px";
+
+          rowCards.forEach(([name, c]) => {
+            let cardClass = "card-entry";
+            if (c.level >= 3) cardClass += " max-level";
+
+            rowDiv.innerHTML += `
+              <div class="${cardClass}" onclick="pokazOknoUlepszenia('${name}')">
+                <img src="${c.image}" alt="${name}" />
+                <div>${name}</div>
+                <small>Lvl ${c.level}${c.level === 3 ? " MAX" : ""} • ${c.count} szt.</small>
+                <small>${c.rarity}</small>
+              </div>
+            `;
+          });
+
+          container.appendChild(rowDiv);
+        }
+      });
+    }
+    function pokazOknoUlepszenia(nazwa) {
+      const karta = player.cards[nazwa];
+      if (!karta) return;
+
+      if (karta.level >= 3) {
+        alert(`${nazwa} jest już na maksymalnym poziomie!`);
+        return;
+      }
+
+      const koszt = rarityConfig[karta.rarity].upgradeCost[karta.level];
+      const wymagane = koszt.cards;
+      const cena = koszt.gold;
+      if (confirm(`${nazwa} (${karta.count}/${wymagane} kart) — Ulepszenie za ${cena} złota?`)) {
+        if (karta.count >= wymagane && player.gold >= cena) {
+          karta.count -= wymagane;
+          player.gold -= cena;
+          karta.level++;
+          if (karta.level === 3) alert(`${nazwa} osiągnęła poziom MAX!`);
+          savePlayer();
+          pokazKarty();
+        } else {
+          alert("Za mało kart lub złota.");
+        }
+      }
+    }
+
+    pokazKarty();
+  </script>
+</body>
+</html>
