@@ -306,11 +306,6 @@
         alert("Za mało gemów!");
         return;
       }
-
-       const gold = getRandomInt(1, 250);
-      player.gold += gold;
-      recentDiv.innerHTML += `<div class="drop-entry"><strong>💰 ${gold} złota</strong></div>`;
-
       const recentDiv = document.getElementById("recent-drops");
       recentDiv.innerHTML = `<h3>🎁 Wypadło z legendarnej skrzyni:</h3>`;
 
@@ -515,6 +510,7 @@ const btnUpgrade = document.querySelector(".btn-upgrade");
   </script>
 </body>
 </html>
+
 
 
 
