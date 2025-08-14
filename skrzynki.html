@@ -255,7 +255,7 @@
 
     function otworzSkrzynke() {
       resetDailyOpensIfNewDay();
-      if (player.dailyOpens >= 500) {
+      if (player.dailyOpens >= 5) {
         alert("Osiągnąłeś dzienny limit 5 skrzyń!");
         return;
       }
@@ -263,7 +263,7 @@
       const recentDiv = document.getElementById("recent-drops");
       recentDiv.innerHTML = `<h3>🎁 Wypadło z ostatniej skrzynki:</h3>`;
 
-      const gold = getRandomInt(1, 1175);
+      const gold = getRandomInt(1, 100);
       const gems = getRandomInt(1, 5);
       player.gold += gold;
       player.gems += gems;
@@ -306,6 +306,10 @@
         alert("Za mało gemów!");
         return;
       }
+
+       const gold = getRandomInt(1, 250);
+      player.gold += gold;
+      recentDiv.innerHTML += `<div class="drop-entry"><strong>💰 ${gold} złota</strong></div>`;
 
       const recentDiv = document.getElementById("recent-drops");
       recentDiv.innerHTML = `<h3>🎁 Wypadło z legendarnej skrzyni:</h3>`;
@@ -511,6 +515,7 @@ const btnUpgrade = document.querySelector(".btn-upgrade");
   </script>
 </body>
 </html>
+
 
 
 
