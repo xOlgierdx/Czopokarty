@@ -262,7 +262,7 @@
 
     function otworzSkrzynke() {
       resetDailyOpensIfNewDay();
-      if (player.dailyOpens >= 10) {
+      if (player.dailyOpens >= 5) {
         alert("Osiągnąłeś dzienny limit 5 skrzyń!");
         return;
       }
@@ -317,6 +317,10 @@
       recentDiv.innerHTML = `<h3>🎁 Wypadło z legendarnej skrzyni:</h3>`;
 
       player.gems -= 50;
+
+      const gold = getRandomInt(1, 250);
+      player.gold += gold;
+      recentDiv.innerHTML += `<div class="drop-entry"><strong>💰 ${gold} złota</strong></div>`;
 
       let availableLegends = cardPool["legendarna"].filter(card => {
         let data = player.cards[card.name];
@@ -517,6 +521,7 @@ const btnUpgrade = document.querySelector(".btn-upgrade");
   </script>
 </body>
 </html>
+
 
 
 
