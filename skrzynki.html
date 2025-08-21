@@ -193,20 +193,27 @@
         { name: "Głupia głowa", image: "grafiki/Pmimir.jpg" },
         { name: "Marcin Stark", image: "grafiki/Mstark.jpg" },
         { name: "Mrost", image: "grafiki/Mrost.jpg" },
-        { name: "Czoker", image: "grafiki/Mjoker.jpg" }
+        { name: "Czoker", image: "grafiki/Mjoker.jpg" },
+        { name: "Luna Plus Size", image: "grafiki/Mlun.jpg" },
+        { name: "Iron Gej", image: "grafiki/Piro.jpg" }
       ],
       rzadka: [
         { name: "Śmiertkeus", image: "grafiki/Satr.jpg" },
         { name: "Ruda baba", image: "grafiki/Saloy.jpg" },
         { name: "Oldur", image: "grafiki/Obal.jpg" },
         { name: "Punishczop", image: "grafiki/Mpunish.jpg" },
-        { name: "Kodyn", image: "grafiki/Kodyn.jpg" }
+        { name: "Kodyn", image: "grafiki/Kodyn.jpg" },
+        { name: "Dziadoki", image: "grafiki/Dlok.jpg" },
+        { name: "Biały Blade", image: "grafiki/Kble.jpg" }
       ],
       epicka: [
         { name: "Szkarłatna wiedźma", image: "grafiki/Owanda.jpg" },
         { name: "Liga Tropicieli", image: "grafiki/OKMliga.jpg" },
         { name: "Dziwak", image: "grafiki/Kstrange.jpg" },
-        { name: "Smeskel i Kambert", image: "grafiki/KSlamesk.jpg" }
+        { name: "Smeskel i Kambert", image: "grafiki/KSlamesk.jpg" },
+        { name: "Pedro Molesto", image: "grafiki/Ofan.jpg" },
+        { name: "Mamuśka", image: "grafiki/Demm.jpg" },
+        { name: "Kapitan Aborcja", image: "grafiki/Kkap.jpg" }
       ],
       legendarna: [
         { name: "Lady Dziadek", image: "grafiki/Slady.jpg" },
@@ -255,7 +262,7 @@
 
     function otworzSkrzynke() {
       resetDailyOpensIfNewDay();
-      if (player.dailyOpens >= 5) {
+      if (player.dailyOpens >= 10) {
         alert("Osiągnąłeś dzienny limit 5 skrzyń!");
         return;
       }
@@ -510,6 +517,7 @@ const btnUpgrade = document.querySelector(".btn-upgrade");
   </script>
 </body>
 </html>
+
 
 
 
