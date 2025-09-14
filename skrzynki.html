@@ -278,7 +278,7 @@
       const recentDiv = document.getElementById("recent-drops");
       recentDiv.innerHTML = `<h3>🎁 Wypadło z ostatniej skrzynki:</h3>`;
 
-      const gold = getRandomInt(1, 150);
+      const gold = getRandomInt(1, 200);
       const gems = getRandomInt(1, 5);
       player.gold += gold;
       player.gems += gems;
@@ -326,7 +326,7 @@
 
       player.gems -= 50;
 
-      const gold = getRandomInt(1, 250);
+      const gold = getRandomInt(1, 350);
       player.gold += gold;
       recentDiv.innerHTML += `<div class="drop-entry"><strong>💰 ${gold} złota</strong></div>`;
 
@@ -529,6 +529,7 @@ const btnUpgrade = document.querySelector(".btn-upgrade");
   </script>
 </body>
 </html>
+
 
 
 
