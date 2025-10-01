@@ -280,7 +280,7 @@
 
     function otworzSkrzynke() {
       resetDailyOpensIfNewDay();
-      if (player.dailyOpens >= 6) {
+      if (player.dailyOpens >= 5) {
         alert("Osiągnąłeś dzienny limit 5 skrzyń!");
         return;
       }
@@ -288,7 +288,7 @@
       const recentDiv = document.getElementById("recent-drops");
       recentDiv.innerHTML = `<h3>🎁 Wypadło z ostatniej skrzynki:</h3>`;
 
-      const gold = getRandomInt(500, 501);
+      const gold = getRandomInt(1, 200);
       const gems = getRandomInt(1, 5);
       player.gold += gold;
       player.gems += gems;
@@ -549,6 +549,7 @@ const btnUpgrade = document.querySelector(".btn-upgrade");
   </script>
 </body>
 </html>
+
 
 
 
