@@ -151,6 +151,27 @@
   background: #555;
   color: white;
 }
+
+.diamond-level {
+  background: linear-gradient(135deg, #00c6ff, #0072ff, #b3ffff);
+  background-size: 400% 400%;
+  animation: diamondGlow 3s ease infinite;
+  color: black;
+  border: 2px solid #66ffff;
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.7);
+}
+
+@keyframes diamondGlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.level-two {
+  background: linear-gradient(135deg, #d3d3d3, #a9a9a9);
+  color: black;
+  border: 2px solid #888;
+}
   </style>
 </head>
 <body>
@@ -180,10 +201,10 @@
 
   <script>
     const rarityConfig = {
-      "pospolita": { chance: 0.4, amount: [1, 50], upgradeCost: { 1: { cards: 200, gold: 200 }, 2: { cards: 500, gold: 500 } } },
-      "rzadka":    { chance: 0.3, amount: [1, 25], upgradeCost: { 1: { cards: 100, gold: 200 }, 2: { cards: 200, gold: 500 } } },
-      "epicka":    { chance: 0.2, amount: [1, 5],  upgradeCost: { 1: { cards: 20,  gold: 200 }, 2: { cards: 40,  gold: 500 } } },
-      "legendarna":{ chance: 0.1, amount: [1, 1], upgradeCost: { 1: { cards: 5,   gold: 200 }, 2: { cards: 10,   gold: 500 } } },
+      "pospolita": { chance: 0.4, amount: [1, 50], upgradeCost: { 1: { cards: 200, gold: 200 }, 2: { cards: 500, gold: 500 }, 3: { cards: 500, gems: 25 } } },
+      "rzadka":    { chance: 0.3, amount: [1, 25], upgradeCost: { 1: { cards: 100, gold: 200 }, 2: { cards: 200, gold: 500 }, 3: { cards: 300, gems: 25 } } },
+      "epicka":    { chance: 0.2, amount: [1, 5],  upgradeCost: { 1: { cards: 20,  gold: 200 }, 2: { cards: 40,  gold: 500 }, 3: { cards: 60, gems: 25 } } },
+      "legendarna":{ chance: 0.1, amount: [1, 1], upgradeCost: { 1: { cards: 5,   gold: 200 }, 2: { cards: 10,   gold: 500 }, 3: { cards: 20, gems: 25 } } },
     };
 
     const cardPool = {
@@ -299,7 +320,7 @@
         const rarity = losujRzadkosc();
         let availableCards = cardPool[rarity].filter(card => {
           let data = player.cards[card.name];
-          return !data || data.level < 3;
+          return !data || data.level < 4;
         });
         if (availableCards.length === 0) continue;
 
@@ -342,7 +363,7 @@
 
       let availableLegends = cardPool["legendarna"].filter(card => {
         let data = player.cards[card.name];
-        return !data || data.level < 3;
+        return !data || data.level < 4;
       });
       if (availableLegends.length === 0) {
         alert("Masz już wszystkie legendarne karty na max poziomie!");
@@ -387,7 +408,7 @@
 for (let i = 0; i < 2; i++) {
   let availableCards = cardPool["rzadka"].filter(card => {
     let data = player.cards[card.name];
-    return !data || data.level < 3;  // tylko jeśli < lvl 3
+    return !data || data.level < 4;
   });
   if (availableCards.length === 0) continue; // jeśli wszystkie są na maxa, pomiń
 
@@ -477,13 +498,15 @@ function pokazKarty() {
 
           rowCards.forEach(([name, c]) => {
             let cardClass = "card-entry";
+            if (c.level === 2) cardClass += " level-two";
             if (c.level >= 3) cardClass += " max-level";
+            if (c.level === 4) cardClass += " diamond-level";
 
             rowDiv.innerHTML += `
               <div class="${cardClass}" onclick="pokazOknoUlepszenia('${name}')">
                 <img src="${c.image}" alt="${name}" />
                 <div>${name}</div>
-                <small>Lvl ${c.level}${c.level === 3 ? " MAX" : ""} • ${c.count} szt.</small>
+                <small>Lvl ${c.level}${c.level === 3 ? " (MAX)" : c.level === 4 ? " (DIAMENT)" : ""} • ${c.count} szt.</small>
                 <small>${c.rarity}</small>
               </div>
             `;
@@ -495,105 +518,76 @@ function pokazKarty() {
     }
      let upgradeTarget = null;
 
-    function pokazOknoUlepszenia(nazwa) {
-      const karta = player.cards[nazwa];
-      if (!karta) return;
-      if (karta.level >= 3) {
-        alert(`${nazwa} jest już na maksymalnym poziomie!`);
-        return;
-      }
+   function pokazOknoUlepszenia(nazwa) {
+  const karta = player.cards[nazwa];
+  if (!karta) return;
+  if (karta.level >= 4) {
+    alert(`${nazwa} jest już na maksymalnym poziomie!`);
+    return;
+  }
 
-      upgradeTarget = nazwa;
-      const koszt = rarityConfig[karta.rarity].upgradeCost[karta.level];
-      const wymagane = koszt.cards;
-      const cena = koszt.gold;
+  upgradeTarget = nazwa;
+  const koszt = rarityConfig[karta.rarity].upgradeCost[karta.level];
+  const wymagane = koszt.cards;
+  const kosztZlota = koszt.gold || 0;
+  const kosztGemow = koszt.gems || 0;
 
-      document.getElementById("upgrade-img").src = karta.image;
-  document.getElementById("upgrade-title").innerText = `${nazwa} — Lvl ${karta.level}`;
-  document.getElementById("upgrade-info").innerText = 
+  // 🔹 USTAWIENIE OBRAZKA I TYTUŁU W MODALU
+  document.getElementById("upgrade-img").src = karta.image;
+  document.getElementById("upgrade-title").innerText = nazwa;
+
+  let kosztTekst = [];
+  if (kosztZlota > 0) kosztTekst.push(`${kosztZlota} złota`);
+  if (kosztGemow > 0) kosztTekst.push(`${kosztGemow} gemów`);
+
+  document.getElementById("upgrade-info").innerText =
     `Masz ${karta.count} / ${wymagane} kart.
-Potrzebujesz ${wymagane} kart i ${cena} złota, aby ulepszyć na poziom ${karta.level + 1}.`;
+Potrzebujesz ${wymagane} kart i ${kosztTekst.join(" i ")}, aby ulepszyć na poziom ${karta.level + 1}.`;
 
-const btnUpgrade = document.querySelector(".btn-upgrade");
-  btnUpgrade.innerText = `Ulepsz (${cena} złota)`;
+  const btnUpgrade = document.querySelector(".btn-upgrade");
+  btnUpgrade.innerText = `Ulepsz (${kosztTekst.join(" + ")})`;
 
-      
-        document.getElementById("upgrade-modal-bg").style.display = "flex";
-    }
+  // 🔹 POKAZANIE MODALU
+  document.getElementById("upgrade-modal-bg").style.display = "flex";
+}
 
     function closeUpgradeModal() {
       document.getElementById("upgrade-modal-bg").style.display = "none";
     }
 
     function confirmUpgrade() {
-      const nazwa = upgradeTarget;
-      const karta = player.cards[nazwa];
-      const koszt = rarityConfig[karta.rarity].upgradeCost[karta.level];
+  const nazwa = upgradeTarget;
+  const karta = player.cards[nazwa];
+  const koszt = rarityConfig[karta.rarity].upgradeCost[karta.level];
 
-      if (karta.count >= koszt.cards && player.gold >= koszt.gold) {
-        karta.count -= koszt.cards;
-        player.gold -= koszt.gold;
-        karta.level++;
-        if (karta.level === 3) alert(`${nazwa} osiągnęła poziom MAX!`);
-        savePlayer();
-        pokazKarty();
-      } else {
-        alert("Za mało kart lub złota.");
-      }
+  const potrzebneKarty = koszt.cards;
+  const kosztZlota = koszt.gold || 0;
+  const kosztGemow = koszt.gems || 0;
 
-      closeUpgradeModal();
+  // Sprawdzenie, czy gracz ma wystarczające zasoby
+  if (karta.count >= potrzebneKarty && player.gold >= kosztZlota && player.gems >= kosztGemow) {
+    karta.count -= potrzebneKarty;
+    player.gold -= kosztZlota;
+    player.gems -= kosztGemow;
+    karta.level++;
+
+    if (karta.level === 3) {
+      alert(`${nazwa} osiągnęła poziom MAX!`);
+    } else if (karta.level === 4) {
+      alert(`${nazwa} osiągnęła poziom MAX (Diamentowy)!`);
     }
+
+    savePlayer();
+    pokazKarty();
+    closeUpgradeModal();
+  } else {
+    alert("Za mało kart, złota lub gemów.");
+  }
+}
 
     
     pokazKarty();
   </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
