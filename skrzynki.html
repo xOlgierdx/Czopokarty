@@ -434,7 +434,7 @@ for (let i = 0; i < 2; i++) {
 for (let i = 0; i < 2; i++) {
   let availableCards = cardPool["epicka"].filter(card => {
     let data = player.cards[card.name];
-    return !data || data.level < 3;
+    return !data || data.level < 4;
   });
   if (availableCards.length === 0) continue;
 
@@ -590,6 +590,7 @@ Potrzebujesz ${wymagane} kart i ${kosztTekst.join(" i ")}, aby ulepszyć na pozi
   </script>
 </body>
 </html>
+
 
 
 
