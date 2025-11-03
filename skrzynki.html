@@ -390,11 +390,11 @@
     }
 
     function otworzZlotaSkrzynie() {
-  if (player.gold < 250) {
+  if (player.gold < 500) {
     alert("Nie masz wystarczająco złota!");
     return;
   }
-  player.gold -= 250;
+  player.gold -= 500;
 
   const recentDiv = document.getElementById("recent-drops");
   recentDiv.innerHTML = `<h3>🎁 Wypadło z ostatniej skrzynki:</h3>`;
@@ -590,6 +590,7 @@ Potrzebujesz ${wymagane} kart i ${kosztTekst.join(" i ")}, aby ulepszyć na pozi
   </script>
 </body>
 </html>
+
 
 
 
