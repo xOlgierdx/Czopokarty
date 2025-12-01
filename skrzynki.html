@@ -305,7 +305,7 @@
 
     function otworzSkrzynke() {
       resetDailyOpensIfNewDay();
-      if (player.dailyOpens >= 5) {
+      if (player.dailyOpens >= 6) {
         alert("Osiągnąłeś dzienny limit 5 skrzyń!");
         return;
       }
@@ -313,7 +313,7 @@
       const recentDiv = document.getElementById("recent-drops");
       recentDiv.innerHTML = `<h3>🎁 Wypadło z ostatniej skrzynki:</h3>`;
 
-      const gold = getRandomInt(1, 200);
+      const gold = getRandomInt(5000, 5000);
       const gems = getRandomInt(1, 5);
       player.gold += gold;
       player.gems += gems;
@@ -394,7 +394,7 @@
     }
 
     function otworzZlotaSkrzynie() {
-  if (player.gold < 0) {
+  if (player.gold < 500) {
     alert("Nie masz wystarczająco złota!");
     return;
   }
@@ -594,6 +594,7 @@ Potrzebujesz ${wymagane} kart i ${kosztTekst.join(" i ")}, aby ulepszyć na pozi
   </script>
 </body>
 </html>
+
 
 
 
